@@ -12,9 +12,8 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10),
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20),
         child: Container(
           height: 80,
           decoration: BoxDecoration(
@@ -47,8 +46,7 @@ class CustomBottomNavBar extends StatelessWidget {
             }),
           ),
         ),
-      ),
-    );
+      );
   }
 
   IconData _getIcon(int index) {
