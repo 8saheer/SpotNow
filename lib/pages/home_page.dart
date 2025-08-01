@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/io_client.dart';
+import 'package:spotnow/ApiServices/ApiService.dart';
 import 'package:spotnow/elements/category_module.dart';
 import 'package:spotnow/elements/user_placeholder.dart';
 import 'package:spotnow/models/landmark.dart';
@@ -11,6 +16,34 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  late final ApiService apiService;
+  late String response;
+
+  List<Landmark> landmarks = [];
+
+  Future<void> getApiResponse() async {
+  try {
+    final result = await apiService.get("Landmark/GetLandmarks");
+
+    if (result.statusCode >= 200 && result.statusCode <= 209) {
+      final List<dynamic> jsonData = jsonDecode(result.body);
+      setState(() {
+        landmarks = jsonData.map((e) => Landmark.fromJson(e)).toList();
+      });
+    }
+  } catch (e) {
+    print('Error fetching landmarks: $e');
+  }
+}
+
+  @override
+  void initState() {
+    super.initState();
+    apiService = ApiService();
+    getApiResponse();
+  }
+  
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _categories = [
@@ -85,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "Where you heading?",
                       style: TextStyle(
                         fontSize: 28,
@@ -185,269 +218,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 20),
 
-                    CategoryModule(
-                      landmarks: [
-                        Landmark(
-                          id: 'l1',
-                          imageUrl: 'https://picsum.photos/300/200?random=1',
-                          overallRating: 4.3,
-                          name: "Fun Beach 1",
-                          distance: 14.3,
-                          description: "A beautiful beach for relaxation.",
-                          category: "Beach",
-                          recentRating: 2.3,
-                        ),
-                        Landmark(
-                          id: 'l2',
-                          imageUrl: 'https://picsum.photos/300/200?random=2',
-                          overallRating: 3.6,
-                          name: "Halfway Log Dump",
-                          distance: 59.4,
-                          description: "Scenic hiking trail with unique rock formations.",
-                          category: "Hiking",
-                          recentRating: 3.8,
-                        ),
-                        Landmark(
-                          id: 'l3',
-                          imageUrl: 'https://picsum.photos/300/200?random=3',
-                          overallRating: 4.8,
-                          name: "Wasaga Beach",
-                          distance: 42.3,
-                          description: "Longest freshwater beach in the world.",
-                          category: "Beach",
-                          recentRating: 4.5,
-                        ),
-                        Landmark(
-                          id: 'l4',
-                          imageUrl: 'https://picsum.photos/300/200?random=4',
-                          overallRating: 4.9,
-                          name: "West Edmonton Mall",
-                          distance: 214.2,
-                          description: "One of the largest malls with an indoor water park.",
-                          category: "Mall",
-                          recentRating: 4.2,
-                        ),
-                        Landmark(
-                          id: 'l5',
-                          imageUrl: 'https://picsum.photos/300/200?random=5',
-                          overallRating: 3.8,
-                          name: "Toogood Pond Park",
-                          distance: 2.1,
-                          description: "Peaceful park with walking trails and a pond.",
-                          category: "Park",
-                          recentRating: 1.2,
-                        ),
-                        Landmark(
-                          id: 'l6',
-                          imageUrl: 'https://picsum.photos/300/200?random=6',
-                          overallRating: 4.1,
-                          name: "Yoho National Park",
-                          distance: 0.8,
-                          description: "Stunning national park with waterfalls and mountains.",
-                          category: "National Park",
-                          recentRating: 2.5,
-                        ),
-                      ],
-                      categoryName: 'Popular Today',
-                    ),
-
-                    CategoryModule(
-                      landmarks: [
-                        Landmark(
-                          id: 'l1',
-                          imageUrl: 'https://picsum.photos/300/200?random=1',
-                          overallRating: 4.3,
-                          name: "Fun Beach 1",
-                          distance: 14.3,
-                          description: "A beautiful beach for relaxation.",
-                          category: "Beach",
-                          recentRating: 2.3,
-                        ),
-                        Landmark(
-                          id: 'l2',
-                          imageUrl: 'https://picsum.photos/300/200?random=2',
-                          overallRating: 3.6,
-                          name: "Halfway Log Dump",
-                          distance: 59.4,
-                          description: "Scenic hiking trail with unique rock formations.",
-                          category: "Hiking",
-                          recentRating: 3.8,
-                        ),
-                        Landmark(
-                          id: 'l3',
-                          imageUrl: 'https://picsum.photos/300/200?random=3',
-                          overallRating: 4.8,
-                          name: "Wasaga Beach",
-                          distance: 42.3,
-                          description: "Longest freshwater beach in the world.",
-                          category: "Beach",
-                          recentRating: 4.5,
-                        ),
-                        Landmark(
-                          id: 'l4',
-                          imageUrl: 'https://picsum.photos/300/200?random=4',
-                          overallRating: 4.9,
-                          name: "West Edmonton Mall",
-                          distance: 214.2,
-                          description: "One of the largest malls with an indoor water park.",
-                          category: "Mall",
-                          recentRating: 4.2,
-                        ),
-                        Landmark(
-                          id: 'l5',
-                          imageUrl: 'https://picsum.photos/300/200?random=5',
-                          overallRating: 3.8,
-                          name: "Toogood Pond Park",
-                          distance: 2.1,
-                          description: "Peaceful park with walking trails and a pond.",
-                          category: "Park",
-                          recentRating: 1.2,
-                        ),
-                        Landmark(
-                          id: 'l6',
-                          imageUrl: 'https://picsum.photos/300/200?random=6',
-                          overallRating: 4.1,
-                          name: "Yoho National Park",
-                          distance: 0.8,
-                          description: "Stunning national park with waterfalls and mountains.",
-                          category: "National Park",
-                          recentRating: 2.5,
-                        ),
-                      ],
-                      categoryName: 'Popular Today',
-                    ),
-
-                    CategoryModule(
-                      landmarks: [
-                        Landmark(
-                          id: 'l1',
-                          imageUrl: 'https://picsum.photos/300/200?random=1',
-                          overallRating: 4.3,
-                          name: "Fun Beach 1",
-                          distance: 14.3,
-                          description: "A beautiful beach for relaxation.",
-                          category: "Beach",
-                          recentRating: 2.3,
-                        ),
-                        Landmark(
-                          id: 'l2',
-                          imageUrl: 'https://picsum.photos/300/200?random=2',
-                          overallRating: 3.6,
-                          name: "Halfway Log Dump",
-                          distance: 59.4,
-                          description: "Scenic hiking trail with unique rock formations.",
-                          category: "Hiking",
-                          recentRating: 3.8,
-                        ),
-                        Landmark(
-                          id: 'l3',
-                          imageUrl: 'https://picsum.photos/300/200?random=3',
-                          overallRating: 4.8,
-                          name: "Wasaga Beach",
-                          distance: 42.3,
-                          description: "Longest freshwater beach in the world.",
-                          category: "Beach",
-                          recentRating: 4.5,
-                        ),
-                        Landmark(
-                          id: 'l4',
-                          imageUrl: 'https://picsum.photos/300/200?random=4',
-                          overallRating: 4.9,
-                          name: "West Edmonton Mall",
-                          distance: 214.2,
-                          description: "One of the largest malls with an indoor water park.",
-                          category: "Mall",
-                          recentRating: 4.2,
-                        ),
-                        Landmark(
-                          id: 'l5',
-                          imageUrl: 'https://picsum.photos/300/200?random=5',
-                          overallRating: 3.8,
-                          name: "Toogood Pond Park",
-                          distance: 2.1,
-                          description: "Peaceful park with walking trails and a pond.",
-                          category: "Park",
-                          recentRating: 1.2,
-                        ),
-                        Landmark(
-                          id: 'l6',
-                          imageUrl: 'https://picsum.photos/300/200?random=6',
-                          overallRating: 4.1,
-                          name: "Yoho National Park",
-                          distance: 0.8,
-                          description: "Stunning national park with waterfalls and mountains.",
-                          category: "National Park",
-                          recentRating: 2.5,
-                        ),
-                      ],
-                      categoryName: 'Popular Today',
-                    ),
-
-                    CategoryModule(
-                      landmarks: [
-                        Landmark(
-                          id: 'l1',
-                          imageUrl: 'https://picsum.photos/300/200?random=1',
-                          overallRating: 4.3,
-                          name: "Fun Beach 1",
-                          distance: 14.3,
-                          description: "A beautiful beach for relaxation.",
-                          category: "Beach",
-                          recentRating: 2.3,
-                        ),
-                        Landmark(
-                          id: 'l2',
-                          imageUrl: 'https://picsum.photos/300/200?random=2',
-                          overallRating: 3.6,
-                          name: "Halfway Log Dump",
-                          distance: 59.4,
-                          description: "Scenic hiking trail with unique rock formations.",
-                          category: "Hiking",
-                          recentRating: 3.8,
-                        ),
-                        Landmark(
-                          id: 'l3',
-                          imageUrl: 'https://picsum.photos/300/200?random=3',
-                          overallRating: 4.8,
-                          name: "Wasaga Beach",
-                          distance: 42.3,
-                          description: "Longest freshwater beach in the world.",
-                          category: "Beach",
-                          recentRating: 4.5,
-                        ),
-                        Landmark(
-                          id: 'l4',
-                          imageUrl: 'https://picsum.photos/300/200?random=4',
-                          overallRating: 4.9,
-                          name: "West Edmonton Mall",
-                          distance: 214.2,
-                          description: "One of the largest malls with an indoor water park.",
-                          category: "Mall",
-                          recentRating: 4.2,
-                        ),
-                        Landmark(
-                          id: 'l5',
-                          imageUrl: 'https://picsum.photos/300/200?random=5',
-                          overallRating: 3.8,
-                          name: "Toogood Pond Park",
-                          distance: 2.1,
-                          description: "Peaceful park with walking trails and a pond.",
-                          category: "Park",
-                          recentRating: 1.2,
-                        ),
-                        Landmark(
-                          id: 'l6',
-                          imageUrl: 'https://picsum.photos/300/200?random=6',
-                          overallRating: 4.1,
-                          name: "Yoho National Park",
-                          distance: 0.8,
-                          description: "Stunning national park with waterfalls and mountains.",
-                          category: "National Park",
-                          recentRating: 2.5,
-                        ),
-                      ],
-                      categoryName: 'Popular Today',
-                    ),
+                    CategoryModule(landmarks: landmarks, categoryName: "Popular Today")
 
                     // Add additional CategoryModule widgets here if needed.
                   ],
