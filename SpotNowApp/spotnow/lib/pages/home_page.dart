@@ -11,7 +11,9 @@ import 'package:spotnow/models/landmark.dart';
 import 'package:spotnow/pages/login_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final int userId;
+
+  const HomePage({super.key, required this.userId});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -215,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? const Color(0xFFC2C2C2) : const Color(0xFFEFEFEF),
+                                  color: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 1.35) : const Color(0xFFEFEFEF),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
@@ -224,8 +226,8 @@ class _HomePageState extends State<HomePage> {
                                     Text(
                                       _categories[index],
                                       style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                        color: isSelected ? Colors.white : Colors.black,
+                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                                       ),
                                     ),
                                     if (isSelected)
@@ -235,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                                           Icon(
                                             Icons.check,
                                             size: 16,
-                                            color: Colors.black,
+                                            color: Colors.white,
                                           ),
                                         ],
                                       ),

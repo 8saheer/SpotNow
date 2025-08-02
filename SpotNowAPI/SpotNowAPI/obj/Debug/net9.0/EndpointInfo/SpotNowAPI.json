@@ -142,6 +142,29 @@
         }
       }
     },
+    "/api/Landmark/AddView/{id}": {
+      "post": {
+        "tags": [
+          "Landmark"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Users/GetUser/{id}": {
       "get": {
         "tags": [
@@ -283,6 +306,29 @@
           }
         }
       }
+    },
+    "/api/Users/AddView/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -330,6 +376,10 @@
               "type": "string"
             },
             "nullable": true
+          },
+          "viewsToday": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

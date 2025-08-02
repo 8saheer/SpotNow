@@ -104,6 +104,24 @@ namespace SpotNowAPI.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("AddView/{id}")]
+        public async Task<IActionResult> AddView(int id)
+        {
+            var landmark = await _context.Landmarks.FindAsync(id);
+
+            if (landmark == null)
+            {
+                return NotFound("Landmark not found");
+            }
+
+            landmark.viewsToday += 1;
+
+            _context.Landmarks.Update(landmark);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "View added", visitedToday = landmark.viewsToday });
+        }
     }
 
     public class LoginRequest

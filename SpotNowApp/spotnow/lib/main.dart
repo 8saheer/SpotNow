@@ -5,15 +5,17 @@ import 'package:spotnow/pages/main_scaffold.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final isLoggedIn = await UserAuthService.isLoggedIn();
+  // We get the user ID directly. It will be null if not logged in.
+  final userId = await UserAuthService.getUserId();
 
-  runApp(SpotNowApp(isLoggedIn: isLoggedIn));
+  runApp(SpotNowApp(userId: userId));
 }
 
 class SpotNowApp extends StatelessWidget {
-  final bool isLoggedIn;
+  // Now the app holds the userId, which is nullable.
+  final int? userId;
 
-  const SpotNowApp({super.key, required this.isLoggedIn});
+  const SpotNowApp({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +23,13 @@ class SpotNowApp extends StatelessWidget {
       title: 'SpotNow',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF1A237E), brightness: Brightness.light),
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
       ),
-      home: isLoggedIn ? const MainScaffold() : const LoginPage(),
+      // If userId is not null, it means the user is logged in.
+      // We pass the userId to MainScaffold.
+      home: userId != null ? MainScaffold(userId: userId!) : const LoginPage(),
     );
   }
 }

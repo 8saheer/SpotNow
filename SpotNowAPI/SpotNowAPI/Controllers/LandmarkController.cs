@@ -95,5 +95,21 @@ namespace SpotNowAPI.Controllers
 
             return Ok($"{landmarks.Count} landmarks added.");
         }
+
+        [HttpPost("AddView/{id}")]
+        public async Task<IActionResult> AddView(int id)
+        {
+            var landmark = await _context.Landmarks.FindAsync(id);
+            if (landmark == null)
+            {
+                return NotFound("Landmark not found");
+            }
+
+            landmark.viewsToday += 1;
+            await _context.SaveChangesAsync();
+
+            return Ok("View count incremented");
+        }
+
     }
 }

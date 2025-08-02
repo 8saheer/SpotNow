@@ -17,6 +17,22 @@
   },
   {
     "ContainingType": "SpotNowAPI.Controllers.LandmarkController",
+    "Method": "AddView",
+    "RelativePath": "api/Landmark/AddView/{id}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkController",
     "Method": "BulkAdd",
     "RelativePath": "api/Landmark/BulkAdd",
     "HttpMethod": "POST",
@@ -71,6 +87,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.UsersController",
+    "Method": "AddView",
+    "RelativePath": "api/Users/AddView/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {

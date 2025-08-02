@@ -12,5 +12,6 @@
         public double recentRating { get; set; }
         
         public required String[] categories { get; set; }
+        public int viewsToday { get; set; }
     }
 }

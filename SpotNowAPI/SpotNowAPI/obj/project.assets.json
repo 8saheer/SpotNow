@@ -5820,11 +5820,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Saheer\\Desktop\\projfolderbackup\\SpotNowAPI\\SpotNowAPI\\SpotNowAPI.csproj",
+      "projectUniqueName": "C:\\Users\\Saheer\\Desktop\\SpotNow\\SpotNowAPI\\SpotNowAPI\\SpotNowAPI.csproj",
       "projectName": "SpotNowAPI",
-      "projectPath": "C:\\Users\\Saheer\\Desktop\\projfolderbackup\\SpotNowAPI\\SpotNowAPI\\SpotNowAPI.csproj",
+      "projectPath": "C:\\Users\\Saheer\\Desktop\\SpotNow\\SpotNowAPI\\SpotNowAPI\\SpotNowAPI.csproj",
       "packagesPath": "C:\\Users\\Saheer\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Saheer\\Desktop\\projfolderbackup\\SpotNowAPI\\SpotNowAPI\\obj\\",
+      "outputPath": "C:\\Users\\Saheer\\Desktop\\SpotNow\\SpotNowAPI\\SpotNowAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
