@@ -1,0 +1,6 @@
+@SpotNowAPI_HostAddress = http://localhost:5196
+
+GET {{SpotNowAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

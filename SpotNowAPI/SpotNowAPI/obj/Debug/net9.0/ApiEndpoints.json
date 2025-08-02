@@ -1,0 +1,160 @@
+[
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkController",
+    "Method": "AddLandmark",
+    "RelativePath": "api/Landmark/AddLandmark",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "landmark",
+        "Type": "SpotNowAPI.Models.Landmark",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkController",
+    "Method": "BulkAdd",
+    "RelativePath": "api/Landmark/BulkAdd",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "landmarks",
+        "Type": "System.Collections.Generic.List\u00601[[SpotNowAPI.Models.Landmark, SpotNowAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkController",
+    "Method": "DeleteLandmark",
+    "RelativePath": "api/Landmark/DeleteLandmark/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkController",
+    "Method": "EditLandmark",
+    "RelativePath": "api/Landmark/EditLandmark",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "landmark",
+        "Type": "SpotNowAPI.Models.Landmark",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkController",
+    "Method": "GetLandmarks",
+    "RelativePath": "api/Landmark/GetLandmarks",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.UsersController",
+    "Method": "DeleteUser",
+    "RelativePath": "api/Users/DeleteUser/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.UsersController",
+    "Method": "GetUser",
+    "RelativePath": "api/Users/GetUser/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "SpotNowAPI.Models.User",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.UsersController",
+    "Method": "Login",
+    "RelativePath": "api/Users/LoginUser",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "SpotNowAPI.DTOs.LoginDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.UsersController",
+    "Method": "Register",
+    "RelativePath": "api/Users/RegisterUser",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "SpotNowAPI.DTOs.RegisterDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "SpotNowAPI.Models.User",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  }
+]
