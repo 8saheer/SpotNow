@@ -33,6 +33,27 @@
   },
   {
     "ContainingType": "SpotNowAPI.Controllers.LandmarkController",
+    "Method": "AddViewIfNotVisited",
+    "RelativePath": "api/Landmark/AddViewIfNotVisited",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "landmarkId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkController",
     "Method": "BulkAdd",
     "RelativePath": "api/Landmark/BulkAdd",
     "HttpMethod": "POST",

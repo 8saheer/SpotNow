@@ -3,22 +3,36 @@ import 'package:spotnow/ApiServices/ApiService.dart';
 import 'package:spotnow/models/landmark.dart';
 
 class LandmarkModule extends StatefulWidget {
-  const LandmarkModule({super.key, required this.landmark});
+  const LandmarkModule({
+    super.key,
+    required this.landmark,
+    required this.userId,
+  });
 
   final Landmark landmark;
+  final int userId;
 
   @override
   State<LandmarkModule> createState() => _LandmarkModuleState();
 }
 
 class _LandmarkModuleState extends State<LandmarkModule> {
-  void incrementView() async {
-    final id = widget.landmark.id;
+  late final ApiService apiService;
 
+  @override
+  void initState() {
+
+    super.initState();
+    apiService = ApiService();
+  }
+  void incrementView() async {
     try {
-      final response = await ApiService().post('Landmark/AddView/$id');
+      final response = await apiService.post(
+        'Landmark/AddViewIfNotVisited?userId=${widget.userId}&landmarkId=${widget.landmark.id}',
+      );
+
       if (response.statusCode == 200) {
-        print('View count incremented for landmark $id');
+        print('View incremented or already visited.');
       } else {
         print('Failed to increment view. Status: ${response.statusCode}');
       }

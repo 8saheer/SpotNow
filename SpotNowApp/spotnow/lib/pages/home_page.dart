@@ -251,7 +251,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 20),
 
-                    CategoryModule(landmarks: popularToday, categoryName: "Popular Today")
+                    CategoryModule(landmarks: popularToday, categoryName: "Popular Today", userId: widget.userId,)
 
                     // Add additional CategoryModule widgets here if needed.
                   ],

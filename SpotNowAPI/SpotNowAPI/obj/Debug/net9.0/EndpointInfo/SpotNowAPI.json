@@ -165,6 +165,36 @@
         }
       }
     },
+    "/api/Landmark/AddViewIfNotVisited": {
+      "post": {
+        "tags": [
+          "Landmark"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "landmarkId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Users/GetUser/{id}": {
       "get": {
         "tags": [

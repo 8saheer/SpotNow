@@ -8,11 +8,13 @@ class CategoryModule extends StatefulWidget {
   const CategoryModule({
     super.key,
     required this.landmarks,
-    required this.categoryName,
+    required this.categoryName, 
+    required this.userId,
   });
 
   final List<Landmark> landmarks;
   final String categoryName;
+  final int userId;
 
   @override
   State<CategoryModule> createState() => _CategoryModuleState();
@@ -78,7 +80,7 @@ class _CategoryModuleState extends State<CategoryModule> {
                 final landmark = landmarksToDisplay[index];
                 return Padding(
                   padding: const EdgeInsets.only(right: 16.0),
-                  child: LandmarkModule(landmark: landmark),
+                  child: LandmarkModule(landmark: landmark, userId: widget.userId,),
                 );
               },
             ),

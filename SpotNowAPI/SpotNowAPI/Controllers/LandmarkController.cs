@@ -111,5 +111,30 @@ namespace SpotNowAPI.Controllers
             return Ok("View count incremented");
         }
 
+        [HttpPost("AddViewIfNotVisited")]
+        public async Task<IActionResult> AddViewIfNotVisited(int userId, int landmarkId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound("User not found");
+
+            var landmark = await _context.Landmarks.FindAsync(landmarkId);
+            if (landmark == null) return NotFound("Landmark not found");
+
+            if (user.visitedLandmarkIds == null)
+                user.visitedLandmarkIds = new List<int>();
+
+            if (user.visitedLandmarkIds.Contains(landmarkId))
+                return Ok("Already visited");
+
+            user.visitedLandmarkIds.Add(landmarkId);
+            landmark.viewsToday += 1;
+
+            _context.Users.Update(user);
+            _context.Landmarks.Update(landmark);
+            await _context.SaveChangesAsync();
+
+            return Ok("View incremented");
+        }
+
     }
 }
