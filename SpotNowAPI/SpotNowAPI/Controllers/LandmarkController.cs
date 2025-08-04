@@ -27,7 +27,8 @@ namespace SpotNowAPI.Controllers
                 imageUrl = x.imageUrl,
                 overallRating = x.overallRating,
                 recentRating = x.recentRating,
-                categories = x.categories
+                categories = x.categories,
+                location = x.location
 
             }).ToListAsync();
 
@@ -66,6 +67,7 @@ namespace SpotNowAPI.Controllers
             existingLandmark.overallRating = landmark.overallRating;
             existingLandmark.recentRating = landmark.recentRating;
             existingLandmark.categories = landmark.categories;
+            existingLandmark.location = landmark.location;
             _context.Landmarks.Update(existingLandmark);
             await _context.SaveChangesAsync();
             return Ok(existingLandmark);
@@ -134,6 +136,31 @@ namespace SpotNowAPI.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("View incremented");
+        }
+
+        [HttpGet("GetLandmark/{id}")]
+        public async Task<IActionResult> GetLandmark(int id)
+        {
+            var landmark = await _context.Landmarks
+                .Where(x => x.id == id)
+                .Select(x => new Landmark
+                {
+                    id = x.id,
+                    name = x.name,
+                    description = x.description,
+                    distance = x.distance,
+                    imageUrl = x.imageUrl,
+                    overallRating = x.overallRating,
+                    recentRating = x.recentRating,
+                    categories = x.categories,
+                    location = x.location
+                })
+                .FirstOrDefaultAsync();
+
+            if (landmark == null)
+                return NotFound("Landmark not found");
+
+            return Ok(landmark);
         }
 
     }

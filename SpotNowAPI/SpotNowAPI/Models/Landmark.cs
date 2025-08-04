@@ -13,5 +13,7 @@
         
         public required String[] categories { get; set; }
         public int viewsToday { get; set; }
+
+        public required string location { get; set; }
     }
 }

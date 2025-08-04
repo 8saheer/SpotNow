@@ -23,6 +23,7 @@ class SpotNowApp extends StatelessWidget {
       title: 'SpotNow',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        fontFamily: 'Inter18',
         colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF1A237E), brightness: Brightness.light),
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),

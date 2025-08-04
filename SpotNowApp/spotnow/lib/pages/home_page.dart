@@ -116,7 +116,12 @@ class _HomePageState extends State<HomePage> {
                   UserPlaceholder(imageUrl: 'https://picsum.photos/150'),
                   const Text(
                     "SpotNow",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 26, 
+                      color: Colors.black87,
+                      fontFamily: 'Inter24',
+                      fontWeight: FontWeight.w800
+                      ),
                   ),
                   Container(
                     padding: const EdgeInsets.all(0.2),
@@ -153,9 +158,10 @@ class _HomePageState extends State<HomePage> {
                       child: Text(
                         "Where you heading?",
                         style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          fontSize: 30,
+                          fontFamily: 'Inter24',
+                          fontWeight: FontWeight.w800,
+                          color: Colors.black87,
                         ),
                       ),
                     ),
