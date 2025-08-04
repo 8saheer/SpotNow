@@ -202,90 +202,82 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16),
-                // Back button
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade200),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 450),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Back button, only visible in register mode
+                  if (_isRegisterMode)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 24.0),
+                      child: GestureDetector(
+                        onTap: _toggleMode, // Toggles back to login mode
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                        ),
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
+                  // Title
+                  Text(
+                    _isRegisterMode ? 'Create Account' : 'Log In',
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
                       color: Colors.black,
-                      size: 20,
                     ),
                   ),
-                ),
-                const SizedBox(height: 60),
-                // Title
-                Text(
-                  _isRegisterMode ? 'Create Account' : 'Log In',
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                  const SizedBox(height: 8),
+                  // Subtitle
+                  Text(
+                    _isRegisterMode
+                        ? 'Welcome Onboard! Fill in your details.'
+                        : 'Welcome back! Log in to continue.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                // Subtitle
-                Text(
-                  _isRegisterMode
-                      ? 'Welcome Onboard! Fill in your details.'
-                      : 'Welcome back! Log in to continue.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Fields
-                if (_isRegisterMode) ...[
+                  const SizedBox(height: 20),
+                  // Fields
+                  if (_isRegisterMode) ...[
+                    _buildTextField(
+                      controller: _nameController,
+                      labelText: 'Full Name',
+                      suffixIcon: Icons.person_outline_rounded,
+                    ),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                      controller: _usernameController,
+                      labelText: 'Username',
+                      suffixIcon: Icons.alternate_email_rounded,
+                    ),
+                    const SizedBox(height: 20),
+                  ],
                   _buildTextField(
-                    controller: _nameController,
-                    labelText: 'Full Name',
-                    suffixIcon: Icons.person_outline_rounded,
+                    controller: _emailController,
+                    labelText: 'Email Address',
+                    suffixIcon: Icons.mail_outline_rounded,
+                    keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 20),
                   _buildTextField(
-                    controller: _usernameController,
-                    labelText: 'Username',
-                    suffixIcon: Icons.alternate_email_rounded,
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                _buildTextField(
-                  controller: _emailController,
-                  labelText: 'Email Address',
-                  suffixIcon: Icons.mail_outline_rounded,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 20),
-                _buildTextField(
-                  controller: _passwordController,
-                  labelText: 'Password',
-                  obscureText: !_isPasswordVisible,
-                  suffixIcon: _isPasswordVisible
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                  onSuffixIconPressed: () {
-                    setState(() => _isPasswordVisible = !_isPasswordVisible);
-                  },
-                ),
-                const SizedBox(height: 20),
-                if (_isRegisterMode) ...[
-                  _buildTextField(
-                    controller: _confirmPasswordController,
-                    labelText: 'Confirm Password',
+                    controller: _passwordController,
+                    labelText: 'Password',
                     obscureText: !_isPasswordVisible,
                     suffixIcon: _isPasswordVisible
                         ? Icons.visibility_off_outlined
@@ -294,61 +286,75 @@ class _LoginPageState extends State<LoginPage> {
                       setState(() => _isPasswordVisible = !_isPasswordVisible);
                     },
                   ),
-                  const SizedBox(height: 40),
-                ],
-                // Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 60,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : (_isRegisterMode ? _register : _login),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
+                  const SizedBox(height: 20),
+                  if (_isRegisterMode) ...[
+                    _buildTextField(
+                      controller: _confirmPasswordController,
+                      labelText: 'Confirm Password',
+                      obscureText: !_isPasswordVisible,
+                      suffixIcon: _isPasswordVisible
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      onSuffixIconPressed: () {
+                        setState(() => _isPasswordVisible = !_isPasswordVisible);
+                      },
                     ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : Text(
-                            _isRegisterMode ? 'Sign Up' : 'Log In',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
+                    const SizedBox(height: 40),
+                  ],
+                  // Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : (_isRegisterMode ? _register : _login),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                      ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              _isRegisterMode ? 'Sign Up' : 'Log In',
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                // Toggle mode
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _isRegisterMode
-                          ? 'Already have an account?'
-                          : 'Don\'t have an account?',
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
-                    GestureDetector(
-                      onTap: _toggleMode,
+                  const SizedBox(height: 24),
+                  // Toggle mode
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _isRegisterMode
+                            ? 'Already have an account?'
+                            : 'Don\'t have an account?',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      GestureDetector(
+                        onTap: _toggleMode,
+                        child: Text(
+                          _isRegisterMode ? ' Log In' : ' Sign Up',
+                          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Error message
+                  if (_error != null) ...[
+                    const SizedBox(height: 16),
+                    Center(
                       child: Text(
-                        _isRegisterMode ? ' Log In' : ' Sign Up',
-                        style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        _error!,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
-                ),
-                // Error message
-                if (_error != null) ...[
-                  const SizedBox(height: 16),
-                  Center(
-                    child: Text(
-                      _error!,
-                      style: const TextStyle(color: Colors.red),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
                 ],
-              ],
+              ),
             ),
           ),
         ),

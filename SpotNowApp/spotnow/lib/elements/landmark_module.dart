@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spotnow/ApiServices/ApiService.dart';
 import 'package:spotnow/models/landmark.dart';
+import 'package:spotnow/pages/landmark_page.dart';
 
 class LandmarkModule extends StatefulWidget {
   const LandmarkModule({
@@ -21,10 +22,10 @@ class _LandmarkModuleState extends State<LandmarkModule> {
 
   @override
   void initState() {
-
     super.initState();
     apiService = ApiService();
   }
+
   void incrementView() async {
     try {
       final response = await apiService.post(
@@ -44,7 +45,18 @@ class _LandmarkModuleState extends State<LandmarkModule> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: incrementView,
+      onTap: () => {
+        incrementView(),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LandmarkPage(
+              landmarkId: widget.landmark.id,
+              userId: widget.userId,
+            ),
+          ),
+        ),
+      },
       child: Container(
         width: 170, // Adjust width as needed based on your layout
         decoration: BoxDecoration(
