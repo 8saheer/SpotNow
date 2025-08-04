@@ -127,6 +127,144 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkInformationController",
+    "Method": "AddCurrentConditions",
+    "RelativePath": "api/LandmarkInformation/AddCurrentConditions",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "SpotNowAPI.Models.CurrentConditionsCreateDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkInformationController",
+    "Method": "UpdateCurrentConditions",
+    "RelativePath": "api/LandmarkInformation/CurrentConditions/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "updatedData",
+        "Type": "SpotNowAPI.Models.CurrentConditions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkInformationController",
+    "Method": "DeleteCurrentConditions",
+    "RelativePath": "api/LandmarkInformation/CurrentConditions/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkInformationController",
+    "Method": "GetCurrentConditions",
+    "RelativePath": "api/LandmarkInformation/CurrentConditions/{landmarkId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "landmarkId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkInformationController",
+    "Method": "AddGeneralInfo",
+    "RelativePath": "api/LandmarkInformation/GeneralInfo",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "data",
+        "Type": "SpotNowAPI.Models.LandmarkDetails",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkInformationController",
+    "Method": "UpdateGeneralInfo",
+    "RelativePath": "api/LandmarkInformation/GeneralInfo/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "updatedData",
+        "Type": "SpotNowAPI.Models.LandmarkDetails",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkInformationController",
+    "Method": "DeleteGeneralInfo",
+    "RelativePath": "api/LandmarkInformation/GeneralInfo/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.LandmarkInformationController",
+    "Method": "GetGeneralInfo",
+    "RelativePath": "api/LandmarkInformation/GeneralInfo/{landmarkId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "landmarkId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SpotNowAPI.Controllers.UsersController",
     "Method": "AddView",
     "RelativePath": "api/Users/AddView/{id}",

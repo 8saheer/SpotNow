@@ -18,9 +18,11 @@ class LandmarkPage extends StatefulWidget {
 }
 
 class _LandmarkPageState extends State<LandmarkPage> {
-  
   final ApiService _apiService = ApiService();
   Map<String, dynamic>? landmarkInfo; // to store fetched landmark data
+  Map<String, dynamic>? currentConditions;
+  Map<String, dynamic>? landmarkDetails;
+  bool _loadingTabData = false;
   bool _isLoading = true;
 
   final List<String> _placeholderImages = [
@@ -38,6 +40,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
   void initState() {
     super.initState();
     _fetchLandmark();
+    _fetchCurrentConditions();
     _pageController.addListener(() {
       final next = _pageController.page?.round() ?? 0;
       if (_currentPage != next) setState(() => _currentPage = next);
@@ -46,7 +49,9 @@ class _LandmarkPageState extends State<LandmarkPage> {
 
   Future<void> _fetchLandmark() async {
     try {
-      final response = await _apiService.get('Landmark/GetLandmark/${widget.landmarkId}');
+      final response = await _apiService.get(
+        'Landmark/GetLandmark/${widget.landmarkId}',
+      );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
@@ -66,6 +71,42 @@ class _LandmarkPageState extends State<LandmarkPage> {
       });
       print(e);
     }
+  }
+
+  Future<void> _fetchCurrentConditions() async {
+    if (currentConditions != null) return; // Already fetched
+    setState(() => _loadingTabData = true);
+    try {
+      final response = await _apiService.get(
+        'LandmarkInformation/CurrentConditions/${widget.landmarkId}',
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          currentConditions = jsonDecode(response.body);
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+    setState(() => _loadingTabData = false);
+  }
+
+  Future<void> _fetchLandmarkDetails() async {
+    if (landmarkDetails != null) return; // Already fetched
+    setState(() => _loadingTabData = true);
+    try {
+      final response = await _apiService.get(
+        'LandmarkDetails/GetByLandmarkId/${widget.landmarkId}',
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          landmarkDetails = jsonDecode(response.body);
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+    setState(() => _loadingTabData = false);
   }
 
   @override
@@ -95,9 +136,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
     final primary = Theme.of(context).primaryColor;
 
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (landmarkInfo == null) {
@@ -222,28 +261,28 @@ class _LandmarkPageState extends State<LandmarkPage> {
                       Row(
                         children: [
                           Icon(Icons.star, color: primary, size: 20),
-                      const SizedBox(width: 3),
-                      Text(
-                        landmarkInfo!['recentRating'].toStringAsFixed(1),
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
+                          const SizedBox(width: 3),
+                          Text(
+                            landmarkInfo!['recentRating'].toStringAsFixed(1),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
 
-                      const Icon(Icons.star, color: Colors.amber, size: 20),
-                      const SizedBox(width: 3),
-                      Text(
-                        landmarkInfo!['overallRating'].toStringAsFixed(1),
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                          const Icon(Icons.star, color: Colors.amber, size: 20),
+                          const SizedBox(width: 3),
+                          Text(
+                            landmarkInfo!['overallRating'].toStringAsFixed(1),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
-                      const SizedBox(width: 110,),
+                      const SizedBox(width: 110),
                       Row(
                         children: [
                           Text(
@@ -252,17 +291,17 @@ class _LandmarkPageState extends State<LandmarkPage> {
                               fontFamily: 'Inter18',
                               fontWeight: FontWeight.w700,
                               color: Colors.grey[700],
-                              fontSize: 16
+                              fontSize: 16,
                             ),
                           ),
-                          const SizedBox(width: 3,),
+                          const SizedBox(width: 3),
                           Icon(
                             Icons.location_on_sharp,
                             color: Colors.grey[700],
                             size: 14,
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -318,59 +357,14 @@ class _LandmarkPageState extends State<LandmarkPage> {
                         },
                       ),
                       const SizedBox(height: 12),
-                      _selectedTab == 0
-                          ? Container(
-                              decoration: BoxDecoration(
-                                color: Color(0xFFEFEFEF),
-                                borderRadius: BorderRadius.circular(12)
-                              ),
-                              alignment: Alignment.center,
-                              child: const Text(
-                                "This is the Current Condition Container",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            )
-                          : Container(
-                              decoration: BoxDecoration(
-                                color: Color(0xFFEFEFEF),
-                                borderRadius: BorderRadius.circular(12)
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      "About",
-                                      style: TextStyle(
-                                        fontSize: 28,
-                                        fontFamily: 'Inter24',
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                
-                                    // Description
-                                    Text(
-                                      landmarkInfo!['description'],
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        height: 1.4,
-                                        fontFamily: 'Inter18',
-                                      ),
-                                    ),
-                                
-                                    const Divider(),
-                                  ],
-                                ),
-                              ),
-                            ),
+
+                      _loadingTabData
+                          ? const Center(child: CircularProgressIndicator())
+                          : (_selectedTab == 0
+                                ? getCurrentConditionContainer()
+                                : getDetailsContainer()),
                     ],
                   ),
-
                   const SizedBox(height: 12),
                 ],
               ),
@@ -379,6 +373,15 @@ class _LandmarkPageState extends State<LandmarkPage> {
         ],
       ),
     );
+  }
+
+  void _onTabSelected(int index) {
+    setState(() => _selectedTab = index);
+    if (index == 0) {
+      _fetchCurrentConditions();
+    } else if (index == 1) {
+      _fetchLandmarkDetails();
+    }
   }
 
   // A helper method for creating the tab buttons.
@@ -391,7 +394,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
     return SizedBox(
       width: tabWidth,
       child: InkWell(
-        onTap: () => setState(() => _selectedTab = index),
+        onTap: () => _onTabSelected(index),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
@@ -403,6 +406,102 @@ class _LandmarkPageState extends State<LandmarkPage> {
               fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget getCurrentConditionContainer() {
+  // Defensive checks in case some data is missing
+  final crowdedness = currentConditions?['crowdednessRating'] ?? 'N/A';
+  final bugs = currentConditions?['bugRating'] ?? 'N/A';
+  final waterCleanliness = currentConditions?['waterCleanlinessRating'] ?? 'N/A';
+  final parking = currentConditions?['parkingAvailable'];
+  final noise = currentConditions?['noiseLevel'] ?? 'N/A';
+  final smell = currentConditions?['smellRating'] ?? 'N/A';
+  final picnic = currentConditions?['picnicSpotAvailable'];
+
+  TextStyle labelStyle = TextStyle(
+    fontFamily: 'Inter18',
+    fontWeight: FontWeight.w700,
+    fontSize: 16,
+    color: Colors.grey[800],
+  );
+
+  TextStyle valueStyle = TextStyle(
+    fontFamily: 'Inter18',
+    fontWeight: FontWeight.w500,
+    fontSize: 16,
+    color: Colors.black87,
+  );
+
+  return Container(
+    decoration: BoxDecoration(
+      color: const Color(0xFFEFEFEF),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildConditionRow('👥 Crowdedness', crowdedness.toString(), labelStyle, valueStyle),
+        _buildConditionRow('🐜 Bug Rating', bugs.toString(), labelStyle, valueStyle),
+        _buildConditionRow('💧 Water Cleanliness', waterCleanliness.toString(), labelStyle, valueStyle),
+        _buildConditionRow('🅿️ Parking Available', parking == null ? 'N/A' : (parking ? 'Yes' : 'No'), labelStyle, valueStyle),
+        _buildConditionRow('🔊 Noise Level', noise.toString(), labelStyle, valueStyle),
+        _buildConditionRow('👃 Smell Rating', smell.toString(), labelStyle, valueStyle),
+        _buildConditionRow('🍽️ Picnic Spot', picnic == null ? 'N/A' : (picnic ? 'Yes' : 'No'), labelStyle, valueStyle),
+      ],
+    ),
+  );
+}
+
+Widget _buildConditionRow(String label, String value, TextStyle labelStyle, TextStyle valueStyle) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: labelStyle),
+        Text(value, style: valueStyle),
+      ],
+    ),
+  );
+}
+
+  getDetailsContainer() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Color(0xFFEFEFEF),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "About",
+              style: TextStyle(
+                fontSize: 28,
+                fontFamily: 'Inter24',
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+
+            // Description
+            Text(
+              landmarkInfo!['description'],
+              style: TextStyle(
+                fontSize: 15,
+                height: 1.4,
+                fontFamily: 'Inter18',
+              ),
+            ),
+
+            const Divider(),
+          ],
         ),
       ),
     );

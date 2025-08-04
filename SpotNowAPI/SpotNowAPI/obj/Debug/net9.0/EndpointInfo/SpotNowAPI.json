@@ -218,6 +218,240 @@
         }
       }
     },
+    "/api/LandmarkInformation/CurrentConditions/{landmarkId}": {
+      "get": {
+        "tags": [
+          "LandmarkInformation"
+        ],
+        "parameters": [
+          {
+            "name": "landmarkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LandmarkInformation/AddCurrentConditions": {
+      "post": {
+        "tags": [
+          "LandmarkInformation"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrentConditionsCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrentConditionsCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrentConditionsCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LandmarkInformation/CurrentConditions/{id}": {
+      "put": {
+        "tags": [
+          "LandmarkInformation"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrentConditions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrentConditions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrentConditions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "LandmarkInformation"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LandmarkInformation/GeneralInfo/{landmarkId}": {
+      "get": {
+        "tags": [
+          "LandmarkInformation"
+        ],
+        "parameters": [
+          {
+            "name": "landmarkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LandmarkInformation/GeneralInfo": {
+      "post": {
+        "tags": [
+          "LandmarkInformation"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LandmarkDetails"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LandmarkDetails"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LandmarkDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LandmarkInformation/GeneralInfo/{id}": {
+      "put": {
+        "tags": [
+          "LandmarkInformation"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LandmarkDetails"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LandmarkDetails"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LandmarkDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "LandmarkInformation"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Users/GetUser/{id}": {
       "get": {
         "tags": [
@@ -386,6 +620,92 @@
   },
   "components": {
     "schemas": {
+      "CurrentConditions": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "landmarkId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "landmark": {
+            "$ref": "#/components/schemas/Landmark"
+          },
+          "crowdednessRating": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "bugRating": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "waterCleanlinessRating": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "parkingAvailable": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "noiseLevel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "smellRating": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "picnicSpotAvailable": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CurrentConditionsCreateDto": {
+        "type": "object",
+        "properties": {
+          "landmarkId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "crowdednessRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "bugRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "waterCleanlinessRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "parkingAvailable": {
+            "type": "boolean"
+          },
+          "noiseLevel": {
+            "type": "number",
+            "format": "double"
+          },
+          "smellRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "picnicSpotAvailable": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "Landmark": {
         "required": [
           "categories",
@@ -436,6 +756,27 @@
             "format": "int32"
           },
           "location": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LandmarkDetails": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "landmarkId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "landmark": {
+            "$ref": "#/components/schemas/Landmark"
+          },
+          "description": {
             "type": "string",
             "nullable": true
           }
