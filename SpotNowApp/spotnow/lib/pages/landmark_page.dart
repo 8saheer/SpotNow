@@ -22,6 +22,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
   Map<String, dynamic>? landmarkInfo; // to store fetched landmark data
   Map<String, dynamic>? currentConditions;
   Map<String, dynamic>? landmarkDetails;
+  bool isLiked = false;
   bool _loadingTabData = false;
   bool _isLoading = true;
 
@@ -41,10 +42,44 @@ class _LandmarkPageState extends State<LandmarkPage> {
     super.initState();
     _fetchLandmark();
     _fetchCurrentConditions();
+    _fetchIfLiked();
     _pageController.addListener(() {
       final next = _pageController.page?.round() ?? 0;
       if (_currentPage != next) setState(() => _currentPage = next);
     });
+  }
+
+  Future<void> _toggleLikedLandmark() async {
+    try {
+      final response = await _apiService.post(
+        'Users/ToggleLikedLandmark/${widget.landmarkId}/${widget.userId}',
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          isLiked = data;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _fetchIfLiked() async {
+    try {
+      final response = await _apiService.get(
+        'Users/CheckIfLiked/${widget.landmarkId}/${widget.userId}',
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print(data);
+        setState(() {
+          isLiked = data;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> _fetchLandmark() async {
@@ -115,18 +150,24 @@ class _LandmarkPageState extends State<LandmarkPage> {
     super.dispose();
   }
 
-  Widget _iconCircle(IconData icon, VoidCallback onTap) {
-    return Container(
-      width: 40,
-      height: 40,
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
-      child: IconButton(
-        icon: Icon(icon, color: Colors.white),
-        iconSize: 24,
-        padding: EdgeInsets.zero,
-        onPressed: onTap,
-        splashRadius: 10,
+  Widget _iconCircle(
+    IconData icon,
+    VoidCallback onTap, {
+    Color iconColor = Colors.white,
+  }) {
+    return GestureDetector(
+      child: Container(
+        width: 40,
+        height: 40,
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
+        child: IconButton(
+          icon: Icon(icon, color: iconColor),
+          iconSize: 24,
+          padding: EdgeInsets.zero,
+          onPressed: onTap,
+          splashRadius: 10,
+        ),
       ),
     );
   }
@@ -160,7 +201,13 @@ class _LandmarkPageState extends State<LandmarkPage> {
             ),
             actions: [
               _iconCircle(Icons.share, () {}),
-              _iconCircle(Icons.favorite_border, () {}),
+              _iconCircle(
+                isLiked ? Icons.favorite : Icons.favorite_border,
+                () {
+                  _toggleLikedLandmark();
+                },
+                iconColor: isLiked ? Colors.red : Colors.white,
+              ),
               const SizedBox(width: 8),
             ],
             flexibleSpace: FlexibleSpaceBar(
@@ -412,62 +459,103 @@ class _LandmarkPageState extends State<LandmarkPage> {
   }
 
   Widget getCurrentConditionContainer() {
-  // Defensive checks in case some data is missing
-  final crowdedness = currentConditions?['crowdednessRating'] ?? 'N/A';
-  final bugs = currentConditions?['bugRating'] ?? 'N/A';
-  final waterCleanliness = currentConditions?['waterCleanlinessRating'] ?? 'N/A';
-  final parking = currentConditions?['parkingAvailable'];
-  final noise = currentConditions?['noiseLevel'] ?? 'N/A';
-  final smell = currentConditions?['smellRating'] ?? 'N/A';
-  final picnic = currentConditions?['picnicSpotAvailable'];
+    // Defensive checks in case some data is missing
+    final crowdedness = currentConditions?['crowdednessRating'] ?? 'N/A';
+    final bugs = currentConditions?['bugRating'] ?? 'N/A';
+    final waterCleanliness =
+        currentConditions?['waterCleanlinessRating'] ?? 'N/A';
+    final parking = currentConditions?['parkingAvailable'];
+    final noise = currentConditions?['noiseLevel'] ?? 'N/A';
+    final smell = currentConditions?['smellRating'] ?? 'N/A';
+    final picnic = currentConditions?['picnicSpotAvailable'];
 
-  TextStyle labelStyle = TextStyle(
-    fontFamily: 'Inter18',
-    fontWeight: FontWeight.w700,
-    fontSize: 16,
-    color: Colors.grey[800],
-  );
+    TextStyle labelStyle = TextStyle(
+      fontFamily: 'Inter18',
+      fontWeight: FontWeight.w700,
+      fontSize: 16,
+      color: Colors.grey[800],
+    );
 
-  TextStyle valueStyle = TextStyle(
-    fontFamily: 'Inter18',
-    fontWeight: FontWeight.w500,
-    fontSize: 16,
-    color: Colors.black87,
-  );
+    TextStyle valueStyle = TextStyle(
+      fontFamily: 'Inter18',
+      fontWeight: FontWeight.w500,
+      fontSize: 16,
+      color: Colors.black87,
+    );
 
-  return Container(
-    decoration: BoxDecoration(
-      color: const Color(0xFFEFEFEF),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildConditionRow('👥 Crowdedness', crowdedness.toString(), labelStyle, valueStyle),
-        _buildConditionRow('🐜 Bug Rating', bugs.toString(), labelStyle, valueStyle),
-        _buildConditionRow('💧 Water Cleanliness', waterCleanliness.toString(), labelStyle, valueStyle),
-        _buildConditionRow('🅿️ Parking Available', parking == null ? 'N/A' : (parking ? 'Yes' : 'No'), labelStyle, valueStyle),
-        _buildConditionRow('🔊 Noise Level', noise.toString(), labelStyle, valueStyle),
-        _buildConditionRow('👃 Smell Rating', smell.toString(), labelStyle, valueStyle),
-        _buildConditionRow('🍽️ Picnic Spot', picnic == null ? 'N/A' : (picnic ? 'Yes' : 'No'), labelStyle, valueStyle),
-      ],
-    ),
-  );
-}
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFEFEF),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildConditionRow(
+            '👥 Crowdedness',
+            crowdedness.toString(),
+            labelStyle,
+            valueStyle,
+          ),
+          _buildConditionRow(
+            '🐜 Bug Rating',
+            bugs.toString(),
+            labelStyle,
+            valueStyle,
+          ),
+          _buildConditionRow(
+            '💧 Water Cleanliness',
+            waterCleanliness.toString(),
+            labelStyle,
+            valueStyle,
+          ),
+          _buildConditionRow(
+            '🅿️ Parking Available',
+            parking == null ? 'N/A' : (parking ? 'Yes' : 'No'),
+            labelStyle,
+            valueStyle,
+          ),
+          _buildConditionRow(
+            '🔊 Noise Level',
+            noise.toString(),
+            labelStyle,
+            valueStyle,
+          ),
+          _buildConditionRow(
+            '👃 Smell Rating',
+            smell.toString(),
+            labelStyle,
+            valueStyle,
+          ),
+          _buildConditionRow(
+            '🍽️ Picnic Spot',
+            picnic == null ? 'N/A' : (picnic ? 'Yes' : 'No'),
+            labelStyle,
+            valueStyle,
+          ),
+        ],
+      ),
+    );
+  }
 
-Widget _buildConditionRow(String label, String value, TextStyle labelStyle, TextStyle valueStyle) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: labelStyle),
-        Text(value, style: valueStyle),
-      ],
-    ),
-  );
-}
+  Widget _buildConditionRow(
+    String label,
+    String value,
+    TextStyle labelStyle,
+    TextStyle valueStyle,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: labelStyle),
+          Text(value, style: valueStyle),
+        ],
+      ),
+    );
+  }
 
   getDetailsContainer() {
     return Container(

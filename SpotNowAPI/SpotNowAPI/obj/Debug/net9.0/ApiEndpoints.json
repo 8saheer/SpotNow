@@ -282,6 +282,27 @@
   },
   {
     "ContainingType": "SpotNowAPI.Controllers.UsersController",
+    "Method": "CheckIfLiked",
+    "RelativePath": "api/Users/CheckIfLiked/{id}/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.UsersController",
     "Method": "DeleteUser",
     "RelativePath": "api/Users/DeleteUser/{id}",
     "HttpMethod": "DELETE",
@@ -363,5 +384,26 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "SpotNowAPI.Controllers.UsersController",
+    "Method": "AddLikedLandmark",
+    "RelativePath": "api/Users/ToggleLikedLandmark/{id}/{userId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

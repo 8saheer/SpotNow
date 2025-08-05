@@ -122,9 +122,63 @@ namespace SpotNowAPI.Controllers
 
             return Ok(new { message = "View added", visitedToday = landmark.viewsToday });
         }
+
+        [HttpPost("ToggleLikedLandmark/{id}/{userId}")]
+        public async Task<IActionResult> AddLikedLandmark(int id, int userId)
+        {
+            var landmark = await _context.Landmarks.FindAsync(id);
+
+            if (landmark == null)
+            {
+                return NotFound("Landmark not found");
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            if (user.likedLandmarkIds.Contains(id))
+            {
+                user.likedLandmarkIds.Remove(id);
+
+            } else
+            {
+                user.likedLandmarkIds.Add(id);
+            }
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(user.likedLandmarkIds.Contains(id));
+        }
+
+        [HttpGet("CheckIfLiked/{id}/{userId}")]
+        public async Task<IActionResult> CheckIfLiked(int id, int userId)
+        {
+            var landmark = await _context.Landmarks.FindAsync(id);
+
+            if (landmark == null)
+            {
+                return NotFound("Landmark not found");
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            bool isLiked = user.likedLandmarkIds != null && user.likedLandmarkIds.Contains(id);
+
+            return Ok(isLiked);
+        }
     }
 
-    public class LoginRequest
+        public class LoginRequest
     {
         public string email { get; set; }
         public string password { get; set; }
