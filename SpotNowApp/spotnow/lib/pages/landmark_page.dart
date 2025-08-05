@@ -434,7 +434,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Current Conditions",
+            "Recent Status",
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
@@ -606,7 +606,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
             size: 24,
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -614,7 +614,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
               Text(
                 label,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                 ),
@@ -625,7 +625,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey.shade600,
                 ),
