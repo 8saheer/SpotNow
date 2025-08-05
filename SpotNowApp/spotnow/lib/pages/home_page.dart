@@ -125,9 +125,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Container(
                     padding: const EdgeInsets.all(0.2),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Color(0xFFEFEFEF),
-                      shape: BoxShape.circle,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(16)
                     ),
                     child: IconButton(
                       icon: Icon(

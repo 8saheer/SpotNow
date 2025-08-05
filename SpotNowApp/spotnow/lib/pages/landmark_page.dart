@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:spotnow/ApiServices/ApiService.dart';
 
@@ -19,7 +18,7 @@ class LandmarkPage extends StatefulWidget {
 
 class _LandmarkPageState extends State<LandmarkPage> {
   final ApiService _apiService = ApiService();
-  Map<String, dynamic>? landmarkInfo; // to store fetched landmark data
+  Map<String, dynamic>? landmarkInfo;
   Map<String, dynamic>? currentConditions;
   Map<String, dynamic>? landmarkDetails;
   bool isLiked = false;
@@ -72,7 +71,6 @@ class _LandmarkPageState extends State<LandmarkPage> {
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print(data);
         setState(() {
           isLiked = data;
         });
@@ -94,11 +92,9 @@ class _LandmarkPageState extends State<LandmarkPage> {
           _isLoading = false;
         });
       } else {
-        // handle error: show message or fallback UI
         setState(() {
           _isLoading = false;
         });
-        // optionally: print or log response.statusCode
       }
     } catch (e) {
       setState(() {
@@ -109,7 +105,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
   }
 
   Future<void> _fetchCurrentConditions() async {
-    if (currentConditions != null) return; // Already fetched
+    if (currentConditions != null) return;
     setState(() => _loadingTabData = true);
     try {
       final response = await _apiService.get(
@@ -127,7 +123,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
   }
 
   Future<void> _fetchLandmarkDetails() async {
-    if (landmarkDetails != null) return; // Already fetched
+    if (landmarkDetails != null) return;
     setState(() => _loadingTabData = true);
     try {
       final response = await _apiService.get(
@@ -181,7 +177,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
     }
 
     if (landmarkInfo == null) {
-      return Scaffold(
+      return const Scaffold(
         body: Center(child: Text('Failed to load landmark data')),
       );
     }
@@ -190,7 +186,6 @@ class _LandmarkPageState extends State<LandmarkPage> {
       backgroundColor: const Color(0xFFFAFAFA),
       body: CustomScrollView(
         slivers: [
-          // === CAROUSEL APP BAR ===
           SliverAppBar(
             backgroundColor: Colors.transparent,
             expandedHeight: 250,
@@ -203,9 +198,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
               _iconCircle(Icons.share, () {}),
               _iconCircle(
                 isLiked ? Icons.favorite : Icons.favorite_border,
-                () {
-                  _toggleLikedLandmark();
-                },
+                () => _toggleLikedLandmark(),
                 iconColor: isLiked ? Colors.red : Colors.white,
               ),
               const SizedBox(width: 8),
@@ -213,7 +206,6 @@ class _LandmarkPageState extends State<LandmarkPage> {
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 children: [
-                  // Rounded carousel images
                   ClipRRect(
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(30),
@@ -228,33 +220,25 @@ class _LandmarkPageState extends State<LandmarkPage> {
                         loadingBuilder: (_, child, p) => p == null
                             ? child
                             : const Center(child: CircularProgressIndicator()),
-                        errorBuilder: (_, __, ___) => const Center(
-                          child: Icon(Icons.error, color: Colors.red),
-                        ),
+                        errorBuilder: (_, __, ___) =>
+                            const Center(child: Icon(Icons.error, color: Colors.red)),
                       ),
                     ),
                   ),
-
-                  // Dots with adaptive rounded backdrop
                   Positioned(
                     bottom: 12,
                     left: 0,
                     right: 0,
                     child: Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: List.generate(_placeholderImages.length, (
-                            i,
-                          ) {
+                          children: List.generate(_placeholderImages.length, (i) {
                             final isActive = i == _currentPage;
                             return AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -275,33 +259,42 @@ class _LandmarkPageState extends State<LandmarkPage> {
               ),
             ),
           ),
-
-          // === DETAILS CONTAINER ===
           SliverToBoxAdapter(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFAFAFA),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title
-                  Text(
-                    landmarkInfo!['name'],
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w800,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        landmarkInfo!['name'],
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.2), // Slightly transparent green
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          "Last update 8d ago", // Hardcoded for now
+                          style: TextStyle(
+                            color: Colors.green.shade800,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 6),
-
-                  // Ratings row
+                  const SizedBox(height: 4,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -311,25 +304,17 @@ class _LandmarkPageState extends State<LandmarkPage> {
                           const SizedBox(width: 3),
                           Text(
                             landmarkInfo!['recentRating'].toStringAsFixed(1),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(width: 12),
-
                           const Icon(Icons.star, color: Colors.amber, size: 20),
                           const SizedBox(width: 3),
                           Text(
                             landmarkInfo!['overallRating'].toStringAsFixed(1),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
-                      const SizedBox(width: 110),
                       Row(
                         children: [
                           Text(
@@ -342,11 +327,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
                             ),
                           ),
                           const SizedBox(width: 3),
-                          Icon(
-                            Icons.location_on_sharp,
-                            color: Colors.grey[700],
-                            size: 14,
-                          ),
+                          Icon(Icons.location_on_sharp, color: Colors.grey[700], size: 14),
                         ],
                       ),
                     ],
@@ -354,49 +335,29 @@ class _LandmarkPageState extends State<LandmarkPage> {
                   const SizedBox(height: 6),
                   const Divider(),
                   const SizedBox(height: 6),
-
-                  // The tab buttons and content.
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Use a LayoutBuilder to get the parent's width reliably
                       LayoutBuilder(
                         builder: (context, constraints) {
-                          final double tabWidth =
-                              constraints.maxWidth / 2; // Assuming 2 tabs
+                          final double tabWidth = constraints.maxWidth / 2;
                           return Stack(
                             children: [
                               Row(
                                 children: [
-                                  // Tab 1
-                                  _tabButton(
-                                    title: "Current Condition",
-                                    index: 0,
-                                    isActive: _selectedTab == 0,
-                                    tabWidth: tabWidth,
-                                  ),
-                                  // Tab 2
-                                  _tabButton(
-                                    title: "Details",
-                                    index: 1,
-                                    isActive: _selectedTab == 1,
-                                    tabWidth: tabWidth,
-                                  ),
+                                  _tabButton("Current Condition", 0, _selectedTab == 0, tabWidth),
+                                  _tabButton("Details", 1, _selectedTab == 1, tabWidth),
                                 ],
                               ),
-                              // The animated sliding line
                               AnimatedPositioned(
                                 duration: const Duration(milliseconds: 150),
                                 curve: Curves.fastEaseInToSlowEaseOut,
                                 left: _selectedTab * tabWidth,
                                 bottom: 0,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(1.5),
-                                  child: Container(
-                                    height: 2,
-                                    width: tabWidth,
-                                    color: primary,
-                                  ),
+                                child: Container(
+                                  height: 2,
+                                  width: tabWidth,
+                                  color: primary,
                                 ),
                               ),
                             ],
@@ -404,12 +365,11 @@ class _LandmarkPageState extends State<LandmarkPage> {
                         },
                       ),
                       const SizedBox(height: 12),
-
                       _loadingTabData
                           ? const Center(child: CircularProgressIndicator())
                           : (_selectedTab == 0
-                                ? getCurrentConditionContainer()
-                                : getDetailsContainer()),
+                              ? getCurrentConditionContainer()
+                              : getDetailsContainer()),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -431,13 +391,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
     }
   }
 
-  // A helper method for creating the tab buttons.
-  Widget _tabButton({
-    required String title,
-    required int index,
-    required bool isActive,
-    required double tabWidth,
-  }) {
+  Widget _tabButton(String title, int index, bool isActive, double tabWidth) {
     return SizedBox(
       width: tabWidth,
       child: InkWell(
@@ -459,138 +413,257 @@ class _LandmarkPageState extends State<LandmarkPage> {
   }
 
   Widget getCurrentConditionContainer() {
-    // Defensive checks in case some data is missing
-    final crowdedness = currentConditions?['crowdednessRating'] ?? 'N/A';
-    final bugs = currentConditions?['bugRating'] ?? 'N/A';
-    final waterCleanliness =
-        currentConditions?['waterCleanlinessRating'] ?? 'N/A';
-    final parking = currentConditions?['parkingAvailable'];
-    final noise = currentConditions?['noiseLevel'] ?? 'N/A';
-    final smell = currentConditions?['smellRating'] ?? 'N/A';
-    final picnic = currentConditions?['picnicSpotAvailable'];
+    final items = [
+      {"icon": Icons.groups, "label": "Crowdedness", "value": currentConditions?['crowdednessRating'] ?? 'N/A'},
+      {"icon": Icons.bug_report, "label": "Bug Rating", "value": currentConditions?['bugRating'] ?? 'N/A'},
+      {"icon": Icons.water, "label": "Water Purity", "value": currentConditions?['waterCleanlinessRating'] ?? 'N/A'},
+      {"icon": Icons.local_parking, "label": "Parking", "value": currentConditions?['parkingAvailable'] == null ? 'N/A' : (currentConditions?['parkingAvailable'] ? 'Yes' : 'No')},
+      {"icon": Icons.volume_up, "label": "Noise Level", "value": currentConditions?['noiseLevel'] ?? 'N/A'},
+      {"icon": Icons.smoking_rooms, "label": "Smell Rating", "value": currentConditions?['smellRating'] ?? 'N/A'},
+      {"icon": Icons.park, "label": "Picnic Spot", "value": currentConditions?['picnicSpotAvailable'] == null ? 'N/A' : (currentConditions?['picnicSpotAvailable'] ? 'Yes' : 'No')},
+    ];
 
-    TextStyle labelStyle = TextStyle(
-      fontFamily: 'Inter18',
-      fontWeight: FontWeight.w700,
-      fontSize: 16,
-      color: Colors.grey[800],
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Current Conditions",
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Divider(height: 20, thickness: 1, color: Colors.grey),
+          ...List.generate(
+            (items.length / 2).ceil(),
+            (index) {
+              final firstItemIndex = index * 2;
+              final secondItemIndex = firstItemIndex + 1;
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildConditionItem(
+                        icon: items[firstItemIndex]["icon"] as IconData,
+                        label: items[firstItemIndex]["label"] as String,
+                        value: items[firstItemIndex]["value"].toString(),
+                      ),
+                    ),
+                    if (secondItemIndex < items.length) ...[
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _buildConditionItem(
+                          icon: items[secondItemIndex]["icon"] as IconData,
+                          label: items[secondItemIndex]["label"] as String,
+                          value: items[secondItemIndex]["value"].toString(),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          ),
+          
+          const SizedBox(height: 8,),
+          
+          const Text("Leave a comment", 
+          style: TextStyle(
+            color: Colors.black,
+            fontFamily: 'Inter24',
+            fontSize: 20
+          )),
+
+          const SizedBox(height: 12),
+
+          // Filters for comments
+          Row(
+            children: [
+              _buildFilterOption(label: 'Date', icon: Icons.keyboard_arrow_down),
+              const SizedBox(width: 8),
+              _buildFilterOption(label: 'Rating', icon: Icons.keyboard_arrow_down),
+              const SizedBox(width: 8),
+              _buildFilterOption(label: 'Recent', icon: Icons.keyboard_arrow_down),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Container for previous messages
+          Container(
+            height: 150, // Fixed height as requested
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0F2F5), // A soft background color
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.center,
+            child: const Text(
+              "Previous messages will appear here",
+              style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Text field for new messages
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: "Write a message...",
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                  ),
+                  minLines: 1,
+                  maxLines: 5,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.8),
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(14)
+                ),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.send_rounded,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    // Send message logic
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
+  }
 
-    TextStyle valueStyle = TextStyle(
-      fontFamily: 'Inter18',
-      fontWeight: FontWeight.w500,
-      fontSize: 16,
-      color: Colors.black87,
+  Widget _buildFilterOption({required String label, required IconData icon}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.black54,
+            ),
+          ),
+          Icon(icon, size: 18, color: Colors.black54),
+        ],
+      ),
     );
+  }
 
+  Widget _buildConditionItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade600,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget getDetailsContainer() {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFEFEFEF),
         borderRadius: BorderRadius.circular(12),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildConditionRow(
-            '👥 Crowdedness',
-            crowdedness.toString(),
-            labelStyle,
-            valueStyle,
-          ),
-          _buildConditionRow(
-            '🐜 Bug Rating',
-            bugs.toString(),
-            labelStyle,
-            valueStyle,
-          ),
-          _buildConditionRow(
-            '💧 Water Cleanliness',
-            waterCleanliness.toString(),
-            labelStyle,
-            valueStyle,
-          ),
-          _buildConditionRow(
-            '🅿️ Parking Available',
-            parking == null ? 'N/A' : (parking ? 'Yes' : 'No'),
-            labelStyle,
-            valueStyle,
-          ),
-          _buildConditionRow(
-            '🔊 Noise Level',
-            noise.toString(),
-            labelStyle,
-            valueStyle,
-          ),
-          _buildConditionRow(
-            '👃 Smell Rating',
-            smell.toString(),
-            labelStyle,
-            valueStyle,
-          ),
-          _buildConditionRow(
-            '🍽️ Picnic Spot',
-            picnic == null ? 'N/A' : (picnic ? 'Yes' : 'No'),
-            labelStyle,
-            valueStyle,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildConditionRow(
-    String label,
-    String value,
-    TextStyle labelStyle,
-    TextStyle valueStyle,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: labelStyle),
-          Text(value, style: valueStyle),
-        ],
-      ),
-    );
-  }
-
-  getDetailsContainer() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(0xFFEFEFEF),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "About",
-              style: TextStyle(
-                fontSize: 28,
-                fontFamily: 'Inter24',
-                fontWeight: FontWeight.w800,
-              ),
+          const Text(
+            "About",
+            style: TextStyle(
+              fontSize: 28,
+              fontFamily: 'Inter24',
+              fontWeight: FontWeight.w800,
             ),
-            const SizedBox(height: 6),
-
-            // Description
-            Text(
-              landmarkInfo!['description'],
-              style: TextStyle(
-                fontSize: 15,
-                height: 1.4,
-                fontFamily: 'Inter18',
-              ),
-            ),
-
-            const Divider(),
-          ],
-        ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            landmarkInfo!['description'],
+            style: const TextStyle(fontSize: 15, height: 1.4, fontFamily: 'Inter18'),
+          ),
+          const Divider(),
+        ],
       ),
     );
   }
