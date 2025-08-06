@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:spotnow/ApiServices/ApiService.dart';
 
@@ -21,6 +22,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
   Map<String, dynamic>? landmarkInfo;
   Map<String, dynamic>? currentConditions;
   Map<String, dynamic>? landmarkDetails;
+  List<dynamic>? landmarkComments;
   bool isLiked = false;
   bool _loadingTabData = false;
   bool _isLoading = true;
@@ -35,17 +37,44 @@ class _LandmarkPageState extends State<LandmarkPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   int _selectedTab = 0;
+  final TextEditingController _commentController =
+      TextEditingController(); // Add a controller for the text field
 
   @override
   void initState() {
     super.initState();
     _fetchLandmark();
     _fetchCurrentConditions();
+    _fetchLandmarkComments();
     _fetchIfLiked();
     _pageController.addListener(() {
       final next = _pageController.page?.round() ?? 0;
       if (_currentPage != next) setState(() => _currentPage = next);
     });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _commentController.dispose(); // Dispose the controller
+    super.dispose();
+  }
+
+  Future<void> _fetchLandmarkComments() async {
+    try {
+      final response = await _apiService.get(
+        'Comments/GetCommentsOnLandmark/${widget.landmarkId}',
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          // Assuming the API returns a list of comments directly
+          landmarkComments = data as List<dynamic>;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> _toggleLikedLandmark() async {
@@ -140,10 +169,74 @@ class _LandmarkPageState extends State<LandmarkPage> {
     setState(() => _loadingTabData = false);
   }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+  // New method to handle sending comments
+Future<void> _sendComment() async {
+  if (_commentController.text.isEmpty) {
+    _showSnackBar("Comment cannot be empty!", Colors.orange);
+    return;
+  }
+
+  final String content = _commentController.text;
+  try {
+    final response = await _apiService.post(
+      'Comments/CreateComment/${widget.userId}/${widget.landmarkId}',
+      body: jsonEncode({
+        'content': content, // Matches CommentDto.Content
+      }),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      _commentController.clear(); 
+      _showSnackBar("Comment Posted", Colors.green);
+      await _fetchLandmarkComments();
+    } else {
+      try {
+        final errorData = jsonDecode(response.body);
+        final errorCode = errorData['errorCode'];
+        final errorMessage = errorData['errorMessage'] ?? "Failed to post comment";
+
+        if (errorCode == 'EMPTY_COMMENT') {
+          _showSnackBar("Comment cannot be empty!", Colors.orange);
+        } else if (errorCode == 'COMMENT_TOO_SOON') {
+          _showSnackBar("You can only comment once per hour on this landmark.", Colors.orange);
+        } else {
+          _showSnackBar("Error: $errorMessage", Colors.red);
+        }
+      } catch (_) {
+        _showSnackBar("Error: Failed to post comment", Colors.red);
+      }
+    }
+  } catch (e) {
+    _showSnackBar("Error: $e", Colors.red);
+  }
+}
+
+
+  // Helper method to show SnackBar notifications
+  void _showSnackBar(String message, Color backgroundColor) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: backgroundColor,
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        // Fix: Adjust the margin to a reasonable distance from the bottom.
+        margin: const EdgeInsets.only(
+          bottom: 20, // 20 pixels from the bottom of the visible screen area
+          left: 30,
+          right: 30,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      ),
+    );
   }
 
   Widget _iconCircle(
@@ -156,7 +249,10 @@ class _LandmarkPageState extends State<LandmarkPage> {
         width: 40,
         height: 40,
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: Colors.black26,
+          shape: BoxShape.circle,
+        ),
         child: IconButton(
           icon: Icon(icon, color: iconColor),
           iconSize: 24,
@@ -220,8 +316,9 @@ class _LandmarkPageState extends State<LandmarkPage> {
                         loadingBuilder: (_, child, p) => p == null
                             ? child
                             : const Center(child: CircularProgressIndicator()),
-                        errorBuilder: (_, __, ___) =>
-                            const Center(child: Icon(Icons.error, color: Colors.red)),
+                        errorBuilder: (_, __, ___) => const Center(
+                          child: Icon(Icons.error, color: Colors.red),
+                        ),
                       ),
                     ),
                   ),
@@ -231,14 +328,19 @@ class _LandmarkPageState extends State<LandmarkPage> {
                     right: 0,
                     child: Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: List.generate(_placeholderImages.length, (i) {
+                          children: List.generate(_placeholderImages.length, (
+                            i,
+                          ) {
                             final isActive = i == _currentPage;
                             return AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -278,9 +380,14 @@ class _LandmarkPageState extends State<LandmarkPage> {
                       ),
                       const SizedBox(height: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.2), // Slightly transparent green
+                          color: Colors.green.withOpacity(
+                            0.2,
+                          ), // Slightly transparent green
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -294,7 +401,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4,),
+                  const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -304,14 +411,20 @@ class _LandmarkPageState extends State<LandmarkPage> {
                           const SizedBox(width: 3),
                           Text(
                             landmarkInfo!['recentRating'].toStringAsFixed(1),
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           const SizedBox(width: 12),
                           const Icon(Icons.star, color: Colors.amber, size: 20),
                           const SizedBox(width: 3),
                           Text(
                             landmarkInfo!['overallRating'].toStringAsFixed(1),
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
@@ -327,7 +440,11 @@ class _LandmarkPageState extends State<LandmarkPage> {
                             ),
                           ),
                           const SizedBox(width: 3),
-                          Icon(Icons.location_on_sharp, color: Colors.grey[700], size: 14),
+                          Icon(
+                            Icons.location_on_sharp,
+                            color: Colors.grey[700],
+                            size: 14,
+                          ),
                         ],
                       ),
                     ],
@@ -345,8 +462,10 @@ class _LandmarkPageState extends State<LandmarkPage> {
                             children: [
                               Row(
                                 children: [
-                                  _tabButton("Current Condition", 0, _selectedTab == 0, tabWidth),
-                                  _tabButton("Details", 1, _selectedTab == 1, tabWidth),
+                                  _tabButton(
+                                      "Current Condition", 0, _selectedTab == 0, tabWidth),
+                                  _tabButton(
+                                      "Details", 1, _selectedTab == 1, tabWidth),
                                 ],
                               ),
                               AnimatedPositioned(
@@ -414,102 +533,173 @@ class _LandmarkPageState extends State<LandmarkPage> {
 
   Widget getCurrentConditionContainer() {
     final items = [
-      {"icon": Icons.groups, "label": "Crowdedness", "value": currentConditions?['crowdednessRating'] ?? 'N/A'},
-      {"icon": Icons.bug_report, "label": "Bug Rating", "value": currentConditions?['bugRating'] ?? 'N/A'},
-      {"icon": Icons.water, "label": "Water Purity", "value": currentConditions?['waterCleanlinessRating'] ?? 'N/A'},
-      {"icon": Icons.local_parking, "label": "Parking", "value": currentConditions?['parkingAvailable'] == null ? 'N/A' : (currentConditions?['parkingAvailable'] ? 'Yes' : 'No')},
-      {"icon": Icons.volume_up, "label": "Noise Level", "value": currentConditions?['noiseLevel'] ?? 'N/A'},
-      {"icon": Icons.smoking_rooms, "label": "Smell Rating", "value": currentConditions?['smellRating'] ?? 'N/A'},
-      {"icon": Icons.park, "label": "Picnic Spot", "value": currentConditions?['picnicSpotAvailable'] == null ? 'N/A' : (currentConditions?['picnicSpotAvailable'] ? 'Yes' : 'No')},
+      {
+        "icon": Icons.groups,
+        "label": "Crowdedness",
+        "value": currentConditions?['crowdednessRating'] ?? 'N/A',
+      },
+      {
+        "icon": Icons.bug_report,
+        "label": "Bug Rating",
+        "value": currentConditions?['bugRating'] ?? 'N/A',
+      },
+      {
+        "icon": Icons.water,
+        "label": "Water Purity",
+        "value": currentConditions?['waterCleanlinessRating'] ?? 'N/A',
+      },
+      {
+        "icon": Icons.local_parking,
+        "label": "Parking",
+        "value": currentConditions?['parkingAvailable'] == null
+            ? 'N/A'
+            : (currentConditions?['parkingAvailable'] ? 'Yes' : 'No'),
+      },
+      {
+        "icon": Icons.volume_up,
+        "label": "Noise Level",
+        "value": currentConditions?['noiseLevel'] ?? 'N/A',
+      },
+      {
+        "icon": Icons.smoking_rooms,
+        "label": "Smell Rating",
+        "value": currentConditions?['smellRating'] ?? 'N/A',
+      },
+      {
+        "icon": Icons.park,
+        "label": "Picnic Spot",
+        "value": currentConditions?['picnicSpotAvailable'] == null
+            ? 'N/A'
+            : (currentConditions?['picnicSpotAvailable'] ? 'Yes' : 'No'),
+      },
     ];
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFFFAFAFA),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             "Recent Status",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-            ),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 6),
           const Divider(height: 20, thickness: 1, color: Colors.grey),
-          ...List.generate(
-            (items.length / 2).ceil(),
-            (index) {
-              final firstItemIndex = index * 2;
-              final secondItemIndex = firstItemIndex + 1;
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Row(
-                  children: [
+          ...List.generate((items.length / 2).ceil(), (index) {
+            final firstItemIndex = index * 2;
+            final secondItemIndex = firstItemIndex + 1;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildConditionItem(
+                      icon: items[firstItemIndex]["icon"] as IconData,
+                      label: items[firstItemIndex]["label"] as String,
+                      value: items[firstItemIndex]["value"].toString(),
+                    ),
+                  ),
+                  if (secondItemIndex < items.length) ...[
+                    const SizedBox(width: 16),
                     Expanded(
                       child: _buildConditionItem(
-                        icon: items[firstItemIndex]["icon"] as IconData,
-                        label: items[firstItemIndex]["label"] as String,
-                        value: items[firstItemIndex]["value"].toString(),
+                        icon: items[secondItemIndex]["icon"] as IconData,
+                        label: items[secondItemIndex]["label"] as String,
+                        value: items[secondItemIndex]["value"].toString(),
                       ),
                     ),
-                    if (secondItemIndex < items.length) ...[
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildConditionItem(
-                          icon: items[secondItemIndex]["icon"] as IconData,
-                          label: items[secondItemIndex]["label"] as String,
-                          value: items[secondItemIndex]["value"].toString(),
-                        ),
-                      ),
-                    ],
                   ],
+                ],
+              ),
+            );
+          }),
+
+          const SizedBox(height: 8),
+
+          // Row for Comments title and Refresh button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Comments", // Changed text to be more descriptive
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Inter24',
+                  fontSize: 20,
                 ),
-              );
-            },
+              ),
+              IconButton(
+                onPressed: () {
+                  _fetchLandmarkComments(); // Call the refresh method
+                },
+                icon: const Icon(
+                  Icons.refresh,
+                  color: Colors.black54,
+                ),
+                tooltip: 'Refresh Comments',
+              ),
+            ],
           ),
           
-          const SizedBox(height: 8,),
-          
-          const Text("Leave a comment", 
-          style: TextStyle(
-            color: Colors.black,
-            fontFamily: 'Inter24',
-            fontSize: 20
-          )),
-
           const SizedBox(height: 12),
 
           // Filters for comments
           Row(
             children: [
-              _buildFilterOption(label: 'Date', icon: Icons.keyboard_arrow_down),
+              _buildFilterOption(
+                label: 'Date',
+                icon: Icons.keyboard_arrow_down,
+              ),
               const SizedBox(width: 8),
-              _buildFilterOption(label: 'Rating', icon: Icons.keyboard_arrow_down),
+              _buildFilterOption(
+                label: 'Rating',
+                icon: Icons.keyboard_arrow_down,
+              ),
               const SizedBox(width: 8),
-              _buildFilterOption(label: 'Recent', icon: Icons.keyboard_arrow_down),
+              _buildFilterOption(
+                label: 'Recent',
+                icon: Icons.keyboard_arrow_down,
+              ),
             ],
           ),
 
           const SizedBox(height: 16),
 
-          // Container for previous messages
+          // Container for previous messages, now scrollable
           Container(
-            height: 150, // Fixed height as requested
+            height: 300, // Fixed height for a scrollable box
             decoration: BoxDecoration(
-              color: const Color(0xFFF0F2F5), // A soft background color
+              color: Color(0xFFFAFAFA), // A soft background color
               borderRadius: BorderRadius.circular(12),
             ),
-            alignment: Alignment.center,
-            child: const Text(
-              "Previous messages will appear here",
-              style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
-            ),
+            child: landmarkComments == null
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  ) // Loading state
+                : landmarkComments!.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "No comments yet.",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(top: 12, bottom: 12, right: 12),
+                        itemCount: landmarkComments!.length,
+                        itemBuilder: (context, index) {
+                          final comment = landmarkComments![index];
+                          // Create a custom widget to display each comment nicely
+                          return _buildCommentItem(comment);
+                        },
+                      ),
           ),
 
           const SizedBox(height: 16),
@@ -519,6 +709,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
             children: [
               Expanded(
                 child: TextField(
+                  controller: _commentController,
                   decoration: InputDecoration(
                     hintText: "Write a message...",
                     filled: true,
@@ -543,16 +734,13 @@ class _LandmarkPageState extends State<LandmarkPage> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor.withOpacity(0.8),
                   shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(14)
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: IconButton(
-                  icon: const Icon(
-                    Icons.send_rounded,
-                    color: Colors.white,
-                  ),
+                  icon: const Icon(Icons.send_rounded, color: Colors.white),
                   onPressed: () {
-                    // Send message logic
-                  },
+                    _sendComment();
+                  }, // Call the new send comment method
                 ),
               ),
             ],
@@ -600,11 +788,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
             color: Theme.of(context).primaryColor.withOpacity(0.8),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 24,
-          ),
+          child: Icon(icon, color: Colors.white, size: 24),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -639,6 +823,76 @@ class _LandmarkPageState extends State<LandmarkPage> {
     );
   }
 
+  // New method to build an individual comment item
+Widget _buildCommentItem(Map<String, dynamic> comment) {
+  // Parse and format the date
+  String formattedDate = '';
+  try {
+    if (comment['date'] != null) {
+      DateTime parsedDate = DateTime.parse(comment['date']);
+      formattedDate =
+          DateFormat('MMM d, yyyy • h:mm a').format(parsedDate.toLocal());
+    }
+  } catch (e) {
+    formattedDate = comment['date'] ?? '';
+  }
+
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 22.0),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const CircleAvatar(
+          radius: 20, // slightly smaller avatar
+          backgroundColor: Colors.grey,
+          child: Icon(Icons.person, color: Colors.white, size: 20),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    comment['name'] ?? 'Anonymous',
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'Inter18',
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    formattedDate,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                      fontFamily: 'Inter18',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                comment['content'] ?? '',
+                style: const TextStyle(
+                  fontFamily: 'Inter18',
+                  fontSize: 15,
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+
+
   Widget getDetailsContainer() {
     return Container(
       decoration: BoxDecoration(
@@ -660,7 +914,11 @@ class _LandmarkPageState extends State<LandmarkPage> {
           const SizedBox(height: 6),
           Text(
             landmarkInfo!['description'],
-            style: const TextStyle(fontSize: 15, height: 1.4, fontFamily: 'Inter18'),
+            style: const TextStyle(
+              fontSize: 15,
+              height: 1.4,
+              fontFamily: 'Inter18',
+            ),
           ),
           const Divider(),
         ],
