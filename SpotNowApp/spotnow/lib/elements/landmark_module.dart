@@ -61,7 +61,7 @@ class _LandmarkModuleState extends State<LandmarkModule> {
         width: 170, // Adjust width as needed based on your layout
         decoration: BoxDecoration(
           color: Color(0xFFFAFAFA), // Background color for the entire module
-          borderRadius: BorderRadius.circular(
+          borderRadius: BorderRadius.circular(  
             10.0,
           ), // Slight corner radius for the module container
         ),

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SpotNowAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+372f6628f10490b2b29978885f0160770c4a86ad")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8a02a6f62d1678d84fa092dff42594865b65c89b")]
 [assembly: System.Reflection.AssemblyProductAttribute("SpotNowAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SpotNowAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

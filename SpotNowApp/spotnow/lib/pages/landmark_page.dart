@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:spotnow/ApiServices/ApiService.dart';
+import 'package:spotnow/elements/custom_button.dart';
 
 class LandmarkPage extends StatefulWidget {
   final int landmarkId;
@@ -37,8 +38,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   int _selectedTab = 0;
-  final TextEditingController _commentController =
-      TextEditingController(); // Add a controller for the text field
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   void initState() {
@@ -56,7 +56,7 @@ class _LandmarkPageState extends State<LandmarkPage> {
   @override
   void dispose() {
     _pageController.dispose();
-    _commentController.dispose(); // Dispose the controller
+    _commentController.dispose();
     super.dispose();
   }
 
@@ -68,7 +68,6 @@ class _LandmarkPageState extends State<LandmarkPage> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
-          // Assuming the API returns a list of comments directly
           landmarkComments = data as List<dynamic>;
         });
       }
@@ -169,51 +168,50 @@ class _LandmarkPageState extends State<LandmarkPage> {
     setState(() => _loadingTabData = false);
   }
 
-  // New method to handle sending comments
-Future<void> _sendComment() async {
-  if (_commentController.text.isEmpty) {
-    _showSnackBar("Comment cannot be empty!", Colors.orange);
-    return;
-  }
-
-  final String content = _commentController.text;
-  try {
-    final response = await _apiService.post(
-      'Comments/CreateComment/${widget.userId}/${widget.landmarkId}',
-      body: jsonEncode({
-        'content': content, // Matches CommentDto.Content
-      }),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode == 200) {
-      _commentController.clear(); 
-      _showSnackBar("Comment Posted", Colors.green);
-      await _fetchLandmarkComments();
-    } else {
-      try {
-        final errorData = jsonDecode(response.body);
-        final errorCode = errorData['errorCode'];
-        final errorMessage = errorData['errorMessage'] ?? "Failed to post comment";
-
-        if (errorCode == 'EMPTY_COMMENT') {
-          _showSnackBar("Comment cannot be empty!", Colors.orange);
-        } else if (errorCode == 'COMMENT_TOO_SOON') {
-          _showSnackBar("You can only comment once per hour on this landmark.", Colors.orange);
-        } else {
-          _showSnackBar("Error: $errorMessage", Colors.red);
-        }
-      } catch (_) {
-        _showSnackBar("Error: Failed to post comment", Colors.red);
-      }
+  Future<void> _sendComment() async {
+    if (_commentController.text.isEmpty) {
+      _showSnackBar("Comment cannot be empty!", Colors.orange);
+      return;
     }
-  } catch (e) {
-    _showSnackBar("Error: $e", Colors.red);
+
+    final String content = _commentController.text;
+    try {
+      final response = await _apiService.post(
+        'Comments/CreateComment/${widget.userId}/${widget.landmarkId}',
+        body: jsonEncode({'content': content}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        _commentController.clear();
+        _showSnackBar("Comment Posted", Colors.green);
+        await _fetchLandmarkComments();
+      } else {
+        try {
+          final errorData = jsonDecode(response.body);
+          final errorCode = errorData['errorCode'];
+          final errorMessage =
+              errorData['errorMessage'] ?? "Failed to post comment";
+
+          if (errorCode == 'EMPTY_COMMENT') {
+            _showSnackBar("Comment cannot be empty!", Colors.orange);
+          } else if (errorCode == 'COMMENT_TOO_SOON') {
+            _showSnackBar(
+              "You can only comment once per hour on this landmark.",
+              Colors.orange,
+            );
+          } else {
+            _showSnackBar("Error: $errorMessage", Colors.red);
+          }
+        } catch (_) {
+          _showSnackBar("Error: Failed to post comment", Colors.red);
+        }
+      }
+    } catch (e) {
+      _showSnackBar("Error: $e", Colors.red);
+    }
   }
-}
 
-
-  // Helper method to show SnackBar notifications
   void _showSnackBar(String message, Color backgroundColor) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -225,15 +223,8 @@ Future<void> _sendComment() async {
         backgroundColor: backgroundColor,
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        // Fix: Adjust the margin to a reasonable distance from the bottom.
-        margin: const EdgeInsets.only(
-          bottom: 20, // 20 pixels from the bottom of the visible screen area
-          left: 30,
-          right: 30,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.only(bottom: 20, left: 30, right: 30),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       ),
     );
@@ -249,7 +240,7 @@ Future<void> _sendComment() async {
         width: 40,
         height: 40,
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.black26,
           shape: BoxShape.circle,
         ),
@@ -463,9 +454,17 @@ Future<void> _sendComment() async {
                               Row(
                                 children: [
                                   _tabButton(
-                                      "Current Condition", 0, _selectedTab == 0, tabWidth),
+                                    "Current Condition",
+                                    0,
+                                    _selectedTab == 0,
+                                    tabWidth,
+                                  ),
                                   _tabButton(
-                                      "Details", 1, _selectedTab == 1, tabWidth),
+                                    "Details",
+                                    1,
+                                    _selectedTab == 1,
+                                    tabWidth,
+                                  ),
                                 ],
                               ),
                               AnimatedPositioned(
@@ -487,8 +486,8 @@ Future<void> _sendComment() async {
                       _loadingTabData
                           ? const Center(child: CircularProgressIndicator())
                           : (_selectedTab == 0
-                              ? getCurrentConditionContainer()
-                              : getDetailsContainer()),
+                                ? getCurrentConditionContainer()
+                                : getDetailsContainer()),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -577,17 +576,51 @@ Future<void> _sendComment() async {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: const Color(0xFFFAFAFA),
         borderRadius: BorderRadius.circular(16),
-
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Recent Status",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Recent Status",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+              ),
+
+              SizedBox(
+                width: MediaQuery.of(context).size.width / 3,
+                height: 35,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // TODO: Handle status update action
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.withOpacity(0.8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    elevation: 0,
+                  ),
+                  child: Center(
+                    child: const Text(
+                      "Make a status update",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+
           const SizedBox(height: 6),
           const Divider(height: 20, thickness: 1, color: Colors.grey),
           ...List.generate((items.length / 2).ceil(), (index) {
@@ -618,15 +651,13 @@ Future<void> _sendComment() async {
               ),
             );
           }),
-
           const SizedBox(height: 8),
 
-          // Row for Comments title and Refresh button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Comments", // Changed text to be more descriptive
+                "Comments",
                 style: TextStyle(
                   color: Colors.black,
                   fontFamily: 'Inter24',
@@ -634,21 +665,14 @@ Future<void> _sendComment() async {
                 ),
               ),
               IconButton(
-                onPressed: () {
-                  _fetchLandmarkComments(); // Call the refresh method
-                },
-                icon: const Icon(
-                  Icons.refresh,
-                  color: Colors.black54,
-                ),
+                onPressed: _fetchLandmarkComments,
+                icon: const Icon(Icons.refresh, color: Colors.black54),
                 tooltip: 'Refresh Comments',
               ),
             ],
           ),
-          
           const SizedBox(height: 12),
 
-          // Filters for comments
           Row(
             children: [
               _buildFilterOption(
@@ -670,18 +694,17 @@ Future<void> _sendComment() async {
 
           const SizedBox(height: 16),
 
-          // Container for previous messages, now scrollable
-          Container(
-            height: 300, // Fixed height for a scrollable box
-            decoration: BoxDecoration(
-              color: Color(0xFFFAFAFA), // A soft background color
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: landmarkComments == null
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  ) // Loading state
-                : landmarkComments!.isEmpty
+          Stack(
+            children: [
+              Container(
+                height: 300,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFAFAFA),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: landmarkComments == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : landmarkComments!.isEmpty
                     ? const Center(
                         child: Text(
                           "No comments yet.",
@@ -692,19 +715,66 @@ Future<void> _sendComment() async {
                         ),
                       )
                     : ListView.builder(
-                        padding: const EdgeInsets.only(top: 12, bottom: 12, right: 12),
+                        padding: const EdgeInsets.only(
+                          top: 12,
+                          bottom: 12,
+                          right: 12,
+                        ),
                         itemCount: landmarkComments!.length,
                         itemBuilder: (context, index) {
-                          final comment = landmarkComments![index];
-                          // Create a custom widget to display each comment nicely
+                          final comment =
+                              landmarkComments![landmarkComments!.length -
+                                  1 -
+                                  index];
                           return _buildCommentItem(comment);
                         },
                       ),
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(
+                  child: Container(
+                    height: 30,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          const Color(0xFFFAFAFA),
+                          const Color(0xFFFAFAFA).withOpacity(0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(
+                  child: Container(
+                    height: 30,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          const Color(0xFFFAFAFA),
+                          const Color(0xFFFAFAFA).withOpacity(0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
 
           const SizedBox(height: 16),
 
-          // Text field for new messages
           Row(
             children: [
               Expanded(
@@ -738,9 +808,7 @@ Future<void> _sendComment() async {
                 ),
                 child: IconButton(
                   icon: const Icon(Icons.send_rounded, color: Colors.white),
-                  onPressed: () {
-                    _sendComment();
-                  }, // Call the new send comment method
+                  onPressed: _sendComment,
                 ),
               ),
             ],
@@ -823,75 +891,75 @@ Future<void> _sendComment() async {
     );
   }
 
-  // New method to build an individual comment item
-Widget _buildCommentItem(Map<String, dynamic> comment) {
-  // Parse and format the date
-  String formattedDate = '';
-  try {
-    if (comment['date'] != null) {
-      DateTime parsedDate = DateTime.parse(comment['date']);
-      formattedDate =
-          DateFormat('MMM d, yyyy • h:mm a').format(parsedDate.toLocal());
+  Widget _buildCommentItem(Map<String, dynamic> comment) {
+    String formattedDate = '';
+    try {
+      if (comment['date'] != null) {
+        DateTime parsedDate = DateTime.parse(comment['date']);
+        formattedDate = DateFormat(
+          'MMM d, yyyy • h:mm a',
+        ).format(parsedDate.toLocal());
+      }
+    } catch (e) {
+      formattedDate = comment['date'] ?? '';
     }
-  } catch (e) {
-    formattedDate = comment['date'] ?? '';
-  }
 
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 22.0),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const CircleAvatar(
-          radius: 20, // slightly smaller avatar
-          backgroundColor: Colors.grey,
-          child: Icon(Icons.person, color: Colors.white, size: 20),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    comment['name'] ?? 'Anonymous',
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.w800,
-                      fontFamily: 'Inter18',
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    formattedDate,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                      fontFamily: 'Inter18',
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                comment['content'] ?? '',
-                style: const TextStyle(
-                  fontFamily: 'Inter18',
-                  fontSize: 15,
-                  height: 1.3,
-                ),
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 22.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.person, color: Colors.white, size: 20),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        comment['name'] ?? 'Anonymous',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.w800,
+                          fontFamily: 'Inter18',
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      formattedDate,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                        fontFamily: 'Inter18',
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  comment['content'] ?? '',
+                  style: const TextStyle(
+                    fontFamily: 'Inter18',
+                    fontSize: 15,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget getDetailsContainer() {
     return Container(
